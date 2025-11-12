@@ -1,6 +1,8 @@
-import { Component, OnInit, OnDestroy, DoCheck } from '@angular/core';
-import { ApiService, Company, Customer } from './services/api.service';
-import { forkJoin, Observable, of, Subject, take } from 'rxjs';
+import { Component, OnInit, } from '@angular/core';
+import { forkJoin, take } from 'rxjs';
+import { CustomerStateService } from './services/customer-state.service';
+import { CompanyStateService } from './services/company-state.service';
+import { Customer, Company } from './services/http/api-http.service';
 
 type CustomerWithCompany = Customer & { companyName?: string };
 
@@ -23,75 +25,54 @@ export class AppComponent implements OnInit {
   tempHolder: any = [];
   isDataLoaded: boolean = false;
   internalCounter = 0;
-  subscription: any;
-  statusText: string = 'ready';
-  cache: any[] = [];
 
-  constructor(private api: ApiService) {
-    console.log('AppComponent constructed');
-    this.initialize();
+  constructor(
+    private readonly customerStateService: CustomerStateService,
+    private readonly companyStateService: CompanyStateService
+  ) {
   }
 
   ngOnInit() {
-    console.log('OnInit triggered');
-    if (this.customers && this.customers.length === 0) {
-      console.log('Customers empty on init');
-    } 
-    
-    this.recalculateAmount();
-    this.statusText = 'initialized';
   }
 
-  initialize() {
-      console.log('Code has initalized');
-  }
 
   recalculateAmount() {
-    this.amountOfCustomer = this.customers?.length ? this.customers.length : 0;
-    this.amountOfCustomer = this.amountOfCustomer + 0;
-    this.amountOfCustomer = Number(this.amountOfCustomer);
+    this.amountOfCustomer = this.customers?.length || 0;
   }
 
+  loadCustomers(): void {
+    if (this.loading) return; // prevent duplicate clicks
+    this.loading = true;
+    this.error = null;
 
-  loadCustomers(): void{
-    forkJoin([this.api.GetUsers(), this.api.GetCompanies()])
-    .pipe(take(1))
-    .subscribe((data) => {
-      const [customers, companies] = data;  
-        this.customers = customers.map(cust => {
-          const company = companies.find(comp => comp.companyId === (cust as any).companyId);
-          return { ...cust, companyName: company ? company.companyName : 'Unknown' };
-        });
-        this.companies = companies;
-        this.isDataLoaded = true;
-        this.recalculateAmount();
-    });
+    forkJoin([
+      this.customerStateService.getAll(),
+      this.companyStateService.getAll()
+    ])
+      .pipe(take(1))
+      .subscribe({
+        next: (data) => {
+          const [customers, companies] = data;
+          this.customers = this.sortByTitle(customers).map(cust => {
+            const company = companies.find(comp => comp.companyId === (cust as any).companyId);
+            return { ...cust, companyName: company ? company.companyName : 'Unknown' };
+          });
+          this.companies = companies;
+          this.isDataLoaded = true;
+          this.loading = false;
+          this.recalculateAmount();
+        },
+        error: (err) => {
+          console.error(err);
+          this.error = 'Failed to load data';
+          this.loading = false;
+        }
+      });
   }
 
-
-
-  getCustomerTitles(): string[] {
-    let titles: string[] = [];
-    for (let i = 0; i < this.customers.length; i++) {
-      titles.push(this.customers[i].title);
-    }
-    return titles.filter(x => x !== undefined);
-  }
-
-  logAllCustomers() {
-    for (const c of this.customers) {
-      console.log(c.fullName ?? 'Unknown');
-    }
-  }
-  // SortByTitle(customers: any) {
-  //   customers.sort();
-  //   return customers();
-  // }
-
-  backupCustomers() {
-    this.backupData = JSON.parse(JSON.stringify(this.customers));
-    this.tempHolder = [...this.customers];
-    this.cache.push(this.backupData);
+  sortByTitle(customers: Customer[]): Customer[] {
+    customers.sort((a, b) => a.title.localeCompare(b.title));
+    return customers;
   }
 
   resetData() {

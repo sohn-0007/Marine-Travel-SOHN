@@ -1,20 +1,24 @@
 <h2> Customers </h2>
-
 <div id="mainContainer" class="container" style="border:1px solid #ccc; padding: 5px;">
   <div style="margin: 10px;">
-    <button (click)="loadCustomers()" [disabled]="loading" style="background-color: lightblue; border: none; cursor: pointer;">
+    <button (click)="loadCustomers()" [disabled]="loading"
+      style="background-color: lightblue; border: none; cursor: pointer;">
       Load Customers
     </button>
     <button (click)="recalculateAmount()" style="background-color: lightgreen; margin-left: 5px;">
       Recalculate (Debug)
     </button>
   </div>
-
-  <div>
-   <strong>Found {{amountOfCustomer}} customers</strong> <ul *ngIf="!loading && !error"> <li *ngFor="let customer of customers"> {{customer.title}} {{customer.fullName}} </li> </ul>
+  <div *ngIf="!loading && !error">
+    <strong>Found {{amountOfCustomer}} customers</strong>    
   </div>
-
-  <table border="1" style="margin-top: 10px; width: 100%;" *ngIf="isDataLoaded">
+  <div *ngIf="loading" style="color: orange; font-weight: bold;">
+    Loading customers, please wait...
+  </div>
+  <div *ngIf="error" style="color: red; font-weight: bold;">
+    Error loading customers: {{error}}
+  </div>
+  <table border="1" style="margin-top: 10px; width: 100%;" *ngIf="customers?.length">
     <tr>
       <th>Title</th>
       <th>Full Name</th>
@@ -28,7 +32,7 @@
   </table>
 
   <div *ngIf="customers && customers.length > 0" style="margin-top: 10px;">
-    <button (click)="resetData()">Reset</button>
+    <button (click)="resetData()">Reest</button>
   </div>
 
   <footer>
