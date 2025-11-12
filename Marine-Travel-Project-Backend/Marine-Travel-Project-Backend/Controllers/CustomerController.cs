@@ -1,4 +1,3 @@
-using Marine_Travel_Project_Backend.Models;
 using Marine_Travel_Project_Backend.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -20,9 +19,8 @@ public class CustomerController
     [Function("GetAllCustomers")]
     public IActionResult Run([HttpTrigger(AuthorizationLevel.Function, "get", Route = "Customer/GetAll")] HttpRequest req)
     {
-
         var customers = _customerService.Get();
         _logger.LogInformation("C# HTTP trigger function processed a request.");
-        return new OkObjectResult(customers);
+        return new OkObjectResult(customers.Select(c => c.Value).ToList());
     }
 }
