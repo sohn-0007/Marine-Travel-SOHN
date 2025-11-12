@@ -25,6 +25,6 @@ public class CompanyController
     {
         var companies = _companyService.Get();
         _logger.LogInformation("C# HTTP trigger function processed a request.");
-        return new OkObjectResult(companies);
+        return new OkObjectResult(companies.Select(c => c.Value).ToList());
     }
 }
