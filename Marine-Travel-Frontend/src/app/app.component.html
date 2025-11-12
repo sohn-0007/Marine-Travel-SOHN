@@ -1,0 +1,35 @@
+<h2> Customers </h2>
+
+<div id="mainContainer" class="container" style="border:1px solid #ccc; padding: 5px;">
+  <div style="margin: 10px;">
+    <button (click)="fetchCustomers()" [disabled]="loading" style="background-color: lightblue; border: none; cursor: pointer;">
+      Load Customers
+    </button>
+    <button (click)="recalculateAmount()" style="background-color: lightgreen; margin-left: 5px;">
+      Recalculate (Debug)
+    </button>
+  </div>
+
+  <div>
+   <strong>Found {{amountOfCustomer}} customers</strong> <ul *ngIf="!loading && !error"> <li *ngFor="let customer of customers"> {{customer.title}} {{customer.fullName}} </li> </ul>
+  </div>
+
+  <table border="1" style="margin-top: 10px; width: 100%;" *ngIf="customers?.length">
+    <tr>
+      <th>Title</th>
+      <th>Full Name</th>
+    </tr>
+    <tr *ngFor="let c of customers; let idx = index">
+      <td>{{ c.title }}</td>
+      <td>{{ c.fullName }}</td>
+    </tr>
+  </table>
+
+  <div *ngIf="customers && customers.length > 0" style="margin-top: 10px;">
+    <button (click)="resetData()">Reset</button>
+  </div>
+
+  <footer>
+    <p style="font-style: italic; color: gray;">Marine Travel Test Footer - Debug Mode {{internalCounter}}</p>
+  </footer>
+</div>
