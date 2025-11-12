@@ -1,5 +1,10 @@
-
 <div class="flex flex-col">
+    <div class="flex justify-end">
+        <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" (click)="loadCompanies()"
+            [disabled]="loading">
+            Refresh
+        </button>
+    </div>
     <div *ngIf="!loading && !error">
         <strong>Found {{amountOfCompanies}} companies</strong>
     </div>
@@ -9,7 +14,7 @@
     <div *ngIf="error" style="color: red; font-weight: bold;">
         Error loading: {{error}}
     </div>
-     <!-- Skeleton placeholder while loading -->
+    <!-- Skeleton placeholder while loading -->
     <div *ngIf="loading" class="w-full">
         <table class="table-auto w-full">
             <thead>
@@ -46,7 +51,7 @@
     </table>
 
     <div *ngIf="companies && companies.length > 0" style="margin-top: 10px;">
-        <button (click)="resetData()">Reset</button>
+
     </div>
 
 </div>

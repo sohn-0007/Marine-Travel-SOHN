@@ -61,8 +61,8 @@
         </tbody>
     </table>
 
-    <div *ngIf="customers && customers.length > 0" style="margin-top: 10px;">
-        <button (click)="resetData()">Reset</button>
+    <div style="margin-top: 10px;">
+        <button *ngIf="customers && customers.length > 0"  (click)="resetData()">Reset</button>
     </div>
 
 </div>
