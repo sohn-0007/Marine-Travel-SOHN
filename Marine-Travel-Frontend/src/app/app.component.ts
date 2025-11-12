@@ -1,6 +1,10 @@
-import { Component, OnInit, OnDestroy, DoCheck } from '@angular/core';
-import { ApiService, Company, Customer } from './services/api.service';
-import { forkJoin, Observable, of, Subject, take } from 'rxjs';
+import { Component, OnInit } from '@angular/core';
+import { forkJoin, take } from 'rxjs';
+import { Router, NavigationEnd, ActivatedRoute } from '@angular/router';
+import { filter, map } from 'rxjs/operators';
+import { CustomerStateService } from './services/customer-state.service';
+import { CompanyStateService } from './services/company-state.service';
+import { Customer, Company } from './services/http/api-http.service';
 
 type CustomerWithCompany = Customer & { companyName?: string };
 
@@ -11,7 +15,7 @@ type CustomerWithCompany = Customer & { companyName?: string };
 })
 export class AppComponent implements OnInit {
 
-  title = 'Marine-Travel-Project';
+  title = '';
   customers: CustomerWithCompany[] = [];
   companies: Company[] = [];
   error: string | null = null;
@@ -23,83 +27,37 @@ export class AppComponent implements OnInit {
   tempHolder: any = [];
   isDataLoaded: boolean = false;
   internalCounter = 0;
-  subscription: any;
-  statusText: string = 'ready';
-  cache: any[] = [];
 
-  constructor(private api: ApiService) {
-    console.log('AppComponent constructed');
-    this.initialize();
+  activeTitle = this.title;
+
+  constructor(
+    private readonly customerStateService: CustomerStateService,
+    private readonly companyStateService: CompanyStateService
+  ) {
   }
 
   ngOnInit() {
-    console.log('OnInit triggered');
-    if (this.customers && this.customers.length === 0) {
-      console.log('Customers empty on init');
-    } 
-    
-    this.recalculateAmount();
-    this.statusText = 'initialized';
   }
 
-  initialize() {
-      console.log('Code has initalized');
+  ngAfterViewInit(): void {
+    // nothing here — router subscription is set up in constructor
   }
 
-  recalculateAmount() {
-    this.amountOfCustomer = this.customers?.length ? this.customers.length : 0;
-    this.amountOfCustomer = this.amountOfCustomer + 0;
-    this.amountOfCustomer = Number(this.amountOfCustomer);
-  }
-
-
-  loadCustomers(): void{
-    forkJoin([this.api.GetUsers(), this.api.GetCompanies()])
-    .pipe(take(1))
-    .subscribe((data) => {
-      const [customers, companies] = data;  
-        this.customers = customers.map(cust => {
-          const company = companies.find(comp => comp.companyId === (cust as any).companyId);
-          return { ...cust, companyName: company ? company.companyName : 'Unknown' };
-        });
-        this.companies = companies;
-        this.isDataLoaded = true;
-        this.recalculateAmount();
-    });
+  // subscribe to router events to get active route data.title
+  private setupActiveTitle(router: Router, route: ActivatedRoute) {
+    router.events.pipe(
+      filter(evt => evt instanceof NavigationEnd),
+      map(() => {
+        let r: ActivatedRoute | null = route;
+        while (r.firstChild) {
+          r = r.firstChild;
+        }
+        return (r && r.snapshot && r.snapshot.data && (r.snapshot.data['title'])) || this.title || ' ';
+      })
+    ).subscribe((t: string) => this.activeTitle = t);
   }
 
 
 
-  getCustomerTitles(): string[] {
-    let titles: string[] = [];
-    for (let i = 0; i < this.customers.length; i++) {
-      titles.push(this.customers[i].title);
-    }
-    return titles.filter(x => x !== undefined);
-  }
-
-  logAllCustomers() {
-    for (const c of this.customers) {
-      console.log(c.fullName ?? 'Unknown');
-    }
-  }
-  // SortByTitle(customers: any) {
-  //   customers.sort();
-  //   return customers();
-  // }
-
-  backupCustomers() {
-    this.backupData = JSON.parse(JSON.stringify(this.customers));
-    this.tempHolder = [...this.customers];
-    this.cache.push(this.backupData);
-  }
-
-  resetData() {
-    if (confirm('Are you sure?')) {
-      this.customers = [];
-      this.amountOfCustomer = 0;
-      this.error = null;
-    }
-  }
 
 }

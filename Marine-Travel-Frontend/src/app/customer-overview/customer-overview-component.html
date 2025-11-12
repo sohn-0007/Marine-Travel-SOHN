@@ -1,0 +1,68 @@
+
+<div class="flex flex-col">
+    <div class="flex sm:flex-row flex-col gap-2">
+        <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" (click)="loadCustomers()"
+            [disabled]="loading">
+            Load Customers
+        </button>
+        <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+            (click)="recalculateAmount()">
+            Recalculate (Debug)
+        </button>
+    </div>
+    <div *ngIf="!loading && !error">
+        <strong>Found {{amountOfCustomer}} customers</strong>
+    </div>
+    <div *ngIf="loading" style="color: orange; font-weight: bold;">
+        Loading customers, please wait...
+    </div>
+    <div *ngIf="error" style="color: red; font-weight: bold;">
+        Error loading customers: {{error}}
+    </div>
+     <!-- Skeleton placeholder while loading -->
+    <div *ngIf="loading" class="w-full">
+        <table class="table-auto w-full">
+            <thead>
+                <tr>
+                    <th class="px-4 py-2"></th>
+                    <th class="px-4 py-2"></th>
+                    <th class="px-4 py-2"></th>
+                </tr>
+            </thead>
+            <tbody class="animate-pulse">
+                <tr *ngFor="let n of [1,2,3,4,5]" class="border-b">
+                    <td class="px-4 py-2">
+                        <div class="h-4 bg-gray-200 rounded w-32"></div>
+                    </td>
+                    <td class="px-4 py-2">
+                        <div class="h-4 bg-gray-200 rounded w-48"></div>
+                    </td>
+                    <td class="px-4 py-2">
+                        <div class="h-4 bg-gray-200 rounded w-40"></div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <table class="table-auto" *ngIf="!loading && customers?.length">
+        <thead>
+            <tr>
+                <th class="px-4 py-2">Title</th>
+                <th class="px-4 py-2">Full Name</th>
+                <th class="px-4 py-2">Company Name</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let c of customers; let idx = index" [class.bg-gray-100]="idx % 2 === 0">
+                <td class="border px-4 py-2">{{ c.title }}</td>
+                <td class="border px-4 py-2">{{ c.fullName }}</td>
+                <td class="border px-4 py-2">{{ c.companyName }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div style="margin-top: 10px;">
+        <button *ngIf="customers && customers.length > 0"  (click)="resetData()">Reset</button>
+    </div>
+
+</div>
