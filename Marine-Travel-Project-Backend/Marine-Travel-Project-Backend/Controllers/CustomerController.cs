@@ -1,3 +1,4 @@
+using Marine_Travel_Project_Backend.Models;
 using Marine_Travel_Project_Backend.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -21,6 +22,14 @@ public class CustomerController
     {
         var customers = _customerService.Get();
         _logger.LogInformation("C# HTTP trigger function processed a request.");
-        return new OkObjectResult(customers.Select(c => c.Value).ToList());
+        return new OkObjectResult(
+            customers.Select(c => new CustomerModel()
+            {
+                CustomerId = c.Key,
+                FullName = c.Value.FullName,
+                Title = c.Value.Title,
+                CompanyId = c.Value.CompanyId
+            }).ToList()
+            );
     }
 }

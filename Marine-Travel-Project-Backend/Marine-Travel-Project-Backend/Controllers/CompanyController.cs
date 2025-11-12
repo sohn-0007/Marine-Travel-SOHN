@@ -1,3 +1,4 @@
+using Marine_Travel_Project_Backend.Models;
 using Marine_Travel_Project_Backend.Repository.Interfaces;
 using Marine_Travel_Project_Backend.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
@@ -25,6 +26,12 @@ public class CompanyController
     {
         var companies = _companyService.Get();
         _logger.LogInformation("C# HTTP trigger function processed a request.");
-        return new OkObjectResult(companies.Select(c => c.Value).ToList());
+        return new OkObjectResult(
+            companies.Select(c => new CompanyModel()
+            {
+                CompanyId = c.Key,
+                CompanyName = c.Value.CompanyName
+            }).ToList()
+        );
     }
 }

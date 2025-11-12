@@ -7,7 +7,11 @@ namespace Marine_Travel_Project_Backend.Repository
     {
         public Dictionary<Guid, CompanyModel> Get()
         {
-            return new Dictionary<Guid, CompanyModel>
+            return Seed;
+        }
+
+
+        public static Dictionary<Guid, CompanyModel> Seed = new ()
             {
                 [Guid.NewGuid()] = new CompanyModel { CompanyName = "Oceanic Travels" },
                 [Guid.NewGuid()] = new CompanyModel { CompanyName = "Marine Adventures" },
@@ -15,6 +19,5 @@ namespace Marine_Travel_Project_Backend.Repository
                 [Guid.NewGuid()] = new CompanyModel { CompanyName = "Blue Horizon Tours" },
                 [Guid.NewGuid()] = new CompanyModel { CompanyName = "Coastal Cruises" },
             };
-        }
     }
 }

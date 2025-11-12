@@ -12,15 +12,25 @@ namespace Marine_Travel_Project_Backend.Repository
     {
         public Dictionary<Guid ,CustomerModel> Get()
         {
+            var companyKeys = CompanyRepository.Seed.Select(c => c.Key).ToList();
+
+            var random = new Random();
+            ;
+
+
+
+
+
+
             //Simulating DB call
             return new Dictionary<Guid, CustomerModel>
             {
-                [Guid.NewGuid()] = new CustomerModel { FullName = "Mikkel Glerup", Title = "Mr." },
-                [Guid.NewGuid()] = new CustomerModel { FullName = "Lasse Jessen", Title = "Mr." },
-                [Guid.NewGuid()] = new CustomerModel { FullName = "Niels Christensen", Title = "Mr." },
-                [Guid.NewGuid()] = new CustomerModel { FullName = "Benjamin Andersen", Title = "Dr." },
-                [Guid.NewGuid()] = new CustomerModel { FullName = "Mikkel kronborg", Title = "Mrs" },
-                [Guid.NewGuid()] = new CustomerModel { FullName = "Malthe Phillipsen", Title = "" },
+                [Guid.NewGuid()] = new CustomerModel { FullName = "Mikkel Glerup", Title = "Mr.", CompanyId = companyKeys[random.Next(companyKeys.Count)]  },
+                [Guid.NewGuid()] = new CustomerModel { FullName = "Lasse Jessen", Title = "Mr.", CompanyId = companyKeys[random.Next(companyKeys.Count)] },
+                [Guid.NewGuid()] = new CustomerModel { FullName = "Niels Christensen", Title = "Mr.", CompanyId = companyKeys[random.Next(companyKeys.Count)] },
+                [Guid.NewGuid()] = new CustomerModel { FullName = "Benjamin Andersen", Title = "Dr.", CompanyId = companyKeys[random.Next(companyKeys.Count)] },
+                [Guid.NewGuid()] = new CustomerModel { FullName = "Mikkel kronborg", Title = "Mrs", CompanyId = companyKeys[random.Next(companyKeys.Count)] },
+                [Guid.NewGuid()] = new CustomerModel { FullName = "Malthe Phillipsen", Title = "", CompanyId = companyKeys[random.Next(companyKeys.Count)] },
             };
         }
     }
