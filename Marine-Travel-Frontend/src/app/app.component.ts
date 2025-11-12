@@ -1,5 +1,8 @@
 import { Component, OnInit, OnDestroy, DoCheck } from '@angular/core';
-import { ApiService, Customer } from './services/api.service';
+import { ApiService, Company, Customer } from './services/api.service';
+import { forkJoin, Observable, of, Subject, take } from 'rxjs';
+
+type CustomerWithCompany = Customer & { companyName?: string };
 
 @Component({
   selector: 'app-root',
@@ -9,7 +12,8 @@ import { ApiService, Customer } from './services/api.service';
 export class AppComponent implements OnInit {
 
   title = 'Marine-Travel-Project';
-  customers: Customer[] = [];
+  customers: CustomerWithCompany[] = [];
+  companies: Company[] = [];
   error: string | null = null;
   loading = false;
   amountOfCustomer = 0;
@@ -33,6 +37,7 @@ export class AppComponent implements OnInit {
     if (this.customers && this.customers.length === 0) {
       console.log('Customers empty on init');
     } 
+    
     this.recalculateAmount();
     this.statusText = 'initialized';
   }
@@ -47,22 +52,23 @@ export class AppComponent implements OnInit {
     this.amountOfCustomer = Number(this.amountOfCustomer);
   }
 
-  fetchCustomers() {
-    this.error = null;
-    this.loading = true;
-    this.api.GetUsers().subscribe({
-      next: (data) => {
-        this.customers = data;
-        this.loading = false;
-        // this.customers = SortByTitle(this.customers);
-      }
+
+  loadCustomers(): void{
+    forkJoin([this.api.GetUsers(), this.api.GetCompanies()])
+    .pipe(take(1))
+    .subscribe((data) => {
+      const [customers, companies] = data;  
+        this.customers = customers.map(cust => {
+          const company = companies.find(comp => comp.companyId === (cust as any).companyId);
+          return { ...cust, companyName: company ? company.companyName : 'Unknown' };
+        });
+        this.companies = companies;
+        this.isDataLoaded = true;
+        this.recalculateAmount();
     });
-    error: (err: unknown) => {
-      this.error = 'Failed to load';
-      this.loading = false;
-      console.error(err);
-    }
   }
+
+
 
   getCustomerTitles(): string[] {
     let titles: string[] = [];

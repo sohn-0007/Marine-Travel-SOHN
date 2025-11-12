@@ -2,8 +2,8 @@
 
 namespace Marine_Travel_Project_Backend.Services.Interfaces
 {
-    public interface ICustomerService
+    public interface ICompanyService
     {
-        public Dictionary<Guid, CustomerModel> Get();
+        public Dictionary<Guid, CompanyModel> Get();
     }
 }

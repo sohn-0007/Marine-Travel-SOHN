@@ -2,8 +2,8 @@
 
 namespace Marine_Travel_Project_Backend.Repository.Interfaces
 {
-    public interface ICustomerRepository
+    public interface ICompanyRepository
     {
-        public Dictionary<Guid, CustomerModel> Get();
+        public Dictionary<Guid, CompanyModel> Get();
     }
 }
