@@ -1,5 +1,7 @@
-import { Component, OnInit, } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { forkJoin, take } from 'rxjs';
+import { Router, NavigationEnd, ActivatedRoute } from '@angular/router';
+import { filter, map } from 'rxjs/operators';
 import { CustomerStateService } from './services/customer-state.service';
 import { CompanyStateService } from './services/company-state.service';
 import { Customer, Company } from './services/http/api-http.service';
@@ -13,7 +15,7 @@ type CustomerWithCompany = Customer & { companyName?: string };
 })
 export class AppComponent implements OnInit {
 
-  title = 'Marine-Travel-Project';
+  title = '';
   customers: CustomerWithCompany[] = [];
   companies: Company[] = [];
   error: string | null = null;
@@ -26,6 +28,8 @@ export class AppComponent implements OnInit {
   isDataLoaded: boolean = false;
   internalCounter = 0;
 
+  activeTitle = this.title;
+
   constructor(
     private readonly customerStateService: CustomerStateService,
     private readonly companyStateService: CompanyStateService
@@ -35,52 +39,25 @@ export class AppComponent implements OnInit {
   ngOnInit() {
   }
 
-
-  recalculateAmount() {
-    this.amountOfCustomer = this.customers?.length || 0;
+  ngAfterViewInit(): void {
+    // nothing here — router subscription is set up in constructor
   }
 
-  loadCustomers(): void {
-    if (this.loading) return; // prevent duplicate clicks
-    this.loading = true;
-    this.error = null;
-
-    forkJoin([
-      this.customerStateService.getAll(),
-      this.companyStateService.getAll()
-    ])
-      .pipe(take(1))
-      .subscribe({
-        next: (data) => {
-          const [customers, companies] = data;
-          this.customers = this.sortByTitle(customers).map(cust => {
-            const company = companies.find(comp => comp.companyId === (cust as any).companyId);
-            return { ...cust, companyName: company ? company.companyName : 'Unknown' };
-          });
-          this.companies = companies;
-          this.isDataLoaded = true;
-          this.loading = false;
-          this.recalculateAmount();
-        },
-        error: (err) => {
-          console.error(err);
-          this.error = 'Failed to load data';
-          this.loading = false;
+  // subscribe to router events to get active route data.title
+  private setupActiveTitle(router: Router, route: ActivatedRoute) {
+    router.events.pipe(
+      filter(evt => evt instanceof NavigationEnd),
+      map(() => {
+        let r: ActivatedRoute | null = route;
+        while (r.firstChild) {
+          r = r.firstChild;
         }
-      });
+        return (r && r.snapshot && r.snapshot.data && (r.snapshot.data['title'])) || this.title || ' ';
+      })
+    ).subscribe((t: string) => this.activeTitle = t);
   }
 
-  sortByTitle(customers: Customer[]): Customer[] {
-    customers.sort((a, b) => a.title.localeCompare(b.title));
-    return customers;
-  }
 
-  resetData() {
-    if (confirm('Are you sure?')) {
-      this.customers = [];
-      this.amountOfCustomer = 0;
-      this.error = null;
-    }
-  }
+
 
 }
