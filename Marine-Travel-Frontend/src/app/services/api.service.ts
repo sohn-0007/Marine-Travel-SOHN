@@ -3,18 +3,27 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 
-export interface Customer{
+export interface Customer {
   customerId: string;
   fullName: string;
-  title: string;
+  title: string;    
 }
+export interface Company {
+  companyId: string;
+  companyName: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class ApiService {
- private readonly baseUrl = 'http://localhost:7168/api';
+  private readonly baseUrl = 'http://localhost:7168/api';
   constructor(private http: HttpClient) { }
-  GetUsers():Observable<Customer[]>{
+  GetUsers(): Observable<Customer[]> {
     return this.http.get<Customer[]>('http://localhost:7168/api/Customer/GetAll');
+  }
+
+  GetCompanies(): Observable<Company[]> {
+    return this.http.get<Company[]>('http://localhost:7168/api/Company/GetAll');
   }
 }

@@ -2,7 +2,7 @@
 
 <div id="mainContainer" class="container" style="border:1px solid #ccc; padding: 5px;">
   <div style="margin: 10px;">
-    <button (click)="fetchCustomers()" [disabled]="loading" style="background-color: lightblue; border: none; cursor: pointer;">
+    <button (click)="loadCustomers()" [disabled]="loading" style="background-color: lightblue; border: none; cursor: pointer;">
       Load Customers
     </button>
     <button (click)="recalculateAmount()" style="background-color: lightgreen; margin-left: 5px;">
@@ -14,14 +14,16 @@
    <strong>Found {{amountOfCustomer}} customers</strong> <ul *ngIf="!loading && !error"> <li *ngFor="let customer of customers"> {{customer.title}} {{customer.fullName}} </li> </ul>
   </div>
 
-  <table border="1" style="margin-top: 10px; width: 100%;" *ngIf="customers?.length">
+  <table border="1" style="margin-top: 10px; width: 100%;" *ngIf="isDataLoaded">
     <tr>
       <th>Title</th>
       <th>Full Name</th>
+      <th>Company Name</th>
     </tr>
     <tr *ngFor="let c of customers; let idx = index">
       <td>{{ c.title }}</td>
       <td>{{ c.fullName }}</td>
+      <td>{{ c.companyName }}</td>
     </tr>
   </table>
 
